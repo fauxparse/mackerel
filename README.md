@@ -1,6 +1,29 @@
 # mackerel
 Derpy web server for Explosion Monday
 
+## Example Request/Response pair
+```
+GET /index.html HTTP/1.0
+User-Agent: MyBrowser/1.0
+
+_______________________________________
+
+HTTP/1.0 200 OK 
+Content-Type: text/html
+Content-Length: 145
+Connection: close 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hello HTTP</title>
+</head>
+<body>
+  <h1>HELLO WORLD</h1>
+  <p>My first HTTP request.</p>
+</body>
+</html>
+```
+
 ## Requests
 
 Request-Line:
