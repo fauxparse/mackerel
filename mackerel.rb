@@ -7,7 +7,7 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: mackerel.rb [options] directory"
 
-  opts.on("-pPORT", "--port=PORT", "Specify the port (default: 80)") do |p|
+  opts.on("-pPORT", "--port=PORT", "Specify the port (default: #{Server::DEFAULTS[:port]})") do |p|
     options[:port] = p
   end
 
