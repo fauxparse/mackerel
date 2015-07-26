@@ -69,8 +69,16 @@ The HEAD method is identical to GET except that the server must not return any E
 The POST method is used to request that the destination server accept the entity enclosed in the request as a new subordinate of the resource identified by the Request-URI in the Request-Line. 
 
 ## Respones
+```
+ Full-Response   = Status-Line              ; Section 6.1
+                   *( General-Header        ; Section 4.3
+                    | Response-Header       ; Section 6.2
+                    | Entity-Header )       ; Section 7.1
+                   CRLF
+                   [ Entity-Body ]          ; Section 7.2
+```
 
-Status-Line:
+#### Status-Line:
 ```
 HTTP-Version SP Status-Code SP Reason-Phrase CRLF
 ```
@@ -79,7 +87,7 @@ For example:
 HTTP/1.1 200 OK\r\n
 ```
 
-Full range of status codes & phrases:
+#### Full range of status codes & phrases:
 ```
  Status-Code    = "200"   ; OK
                 | "201"   ; Created
@@ -96,4 +104,11 @@ Full range of status codes & phrases:
                 | "501"   ; Not Implemented
                 | "502"   ; Bad Gateway
                 | "503"   ; Service Unavailable
+```
+
+#### Response-Headers
+```
+ Response-Header = Location                ; Section 10.11
+                 | Server                  ; Section 10.14
+                 | WWW-Authenticate        ; Section 10.16
 ```
