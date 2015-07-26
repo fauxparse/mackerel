@@ -1,4 +1,5 @@
 require "socket"
+require "./client"
 
 class Server
   DEFAULTS = {
@@ -14,10 +15,14 @@ class Server
 
   def run
     loop do
-      client = server.accept    # Wait for a client to connect
-      client.puts "Hello !"
-      client.puts "Time is #{Time.now}"
-      client.close
+      begin
+        socket = server.accept_nonblock
+      rescue IO::WaitReadable, Errno::EINTR
+        IO.select([server])
+        retry
+      end
+
+      Client.new(socket).handle_request
     end
   end
 
