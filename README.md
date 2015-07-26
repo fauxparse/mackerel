@@ -34,7 +34,7 @@ Full-Request   = Request-Line              ; Section 5.1
                  [ Entity-Body ]           ; Section 7.2
 ```
 
-### Request-Line:
+#### Request-Line:
 ```
 Method SP Request-URI SP HTTP-Version CRLF
 ```
@@ -43,13 +43,13 @@ For example:
 GET / HTTP/1.1\r\n
 ```
 
-### General-Header
+#### General-Header
 ```
 General-Header = Date                     ; Section 10.6
                | Pragma                   ; Section 10.12
 ```
 
-### Request-Header
+#### Request-Header
 ```
 Request-Header = Authorization            ; Section 10.2
                | From                     ; Section 10.8
@@ -57,6 +57,16 @@ Request-Header = Authorization            ; Section 10.2
                | Referer                  ; Section 10.13
                | User-Agent               ; Section 10.15
 ```
+
+#### Methods
+- GET:
+The GET method means retrieve whatever information (in the form of an entity) is identified by the Request-URI.
+
+- HEAD:
+The HEAD method is identical to GET except that the server must not return any Entity-Body in the response. 
+
+- POST:
+The POST method is used to request that the destination server accept the entity enclosed in the request as a new subordinate of the resource identified by the Request-URI in the Request-Line. 
 
 ## Respones
 
