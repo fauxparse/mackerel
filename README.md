@@ -25,14 +25,37 @@ Connection: close
 ```
 
 ## Requests
+```
+Full-Request   = Request-Line              ; Section 5.1
+                 *( General-Header         ; Section 4.3
+                  | Request-Header         ; Section 5.2
+                  | Entity-Header )        ; Section 7.1
+                 CRLF
+                 [ Entity-Body ]           ; Section 7.2
+```
 
-Request-Line:
+### Request-Line:
 ```
 Method SP Request-URI SP HTTP-Version CRLF
 ```
 For example:
 ```
 GET / HTTP/1.1\r\n
+```
+
+### General-Header
+```
+General-Header = Date                     ; Section 10.6
+               | Pragma                   ; Section 10.12
+```
+
+### Request-Header
+```
+Request-Header = Authorization            ; Section 10.2
+               | From                     ; Section 10.8
+               | If-Modified-Since        ; Section 10.9
+               | Referer                  ; Section 10.13
+               | User-Agent               ; Section 10.15
 ```
 
 ## Respones
