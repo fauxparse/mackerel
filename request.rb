@@ -9,7 +9,10 @@ class Request < Struct.new(:socket, :headers, :uri, :body)
   end
 
   def self.parse(socket)
-    request_line = socket.gets.chomp
+    bad_request! unless request_line = socket.gets
+
+    request_line.chomp!
+
     if request_line =~ REQUEST_FORMAT && $3.to_i == 1
       verb = $1
       uri = $2
@@ -17,7 +20,8 @@ class Request < Struct.new(:socket, :headers, :uri, :body)
       klass = request_class_for verb
       if klass
         headers = []
-        while !(line = socket.gets.strip).empty?
+        while line = socket.gets
+          break if line.strip.empty?
           headers << line
         end
         # body = socket.readlines

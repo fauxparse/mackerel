@@ -32,6 +32,6 @@ class Response
   end
 
   def response_line
-    "HTTP/1.0 #{status} #{MESSAGES[status]}\r\n"
+    "HTTP/1.0 #{status} #{Response::MESSAGES[status]}\r\n"
   end
 end
