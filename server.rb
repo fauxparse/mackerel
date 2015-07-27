@@ -17,7 +17,6 @@ class Server
     loop do
       Thread.fork(server.accept) do |socket|
         Client.new(self, socket).handle_request
-        socket.close
       end
     end
   end
