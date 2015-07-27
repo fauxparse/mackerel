@@ -5,8 +5,16 @@ class DirectoryListing < Struct.new(:directory, :root)
     @files ||= Dir.entries(directory).sort
   end
 
+  def headers
+    ["Content-Length: #{html.length}"]
+  end
+
+  def head(socket, &block)
+    Response.new(200, headers).write_to(socket, &block)
+  end
+
   def write_to(socket)
-    Response.new(200, ["Content-Length: #{html.length}"]).write_to(socket) do
+    head(socket) do
       socket.write html
     end
   end

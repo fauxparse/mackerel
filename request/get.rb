@@ -1,8 +1,7 @@
-require "#{File.dirname(__FILE__)}/head"
 require_relative "../directory_listing.rb"
 require "mime/types"
 
-class Request::Get < Request::Head
+class Request::Get < Request
   MEGABYTE = 1_048_576
   INDEX_FILES = %w(index.html index.htm)
 
@@ -14,7 +13,7 @@ class Request::Get < Request::Head
         if File.directory? filename
           write_directory_listing_to socket, filename, server.root
         else
-          pipe_regular_file_to socket, filename
+          write_regular_file_to socket, filename
         end
       else
         send_error_response socket, 403, "Access to #{filename} is forbidden."
@@ -24,15 +23,17 @@ class Request::Get < Request::Head
     end
   end
 
-  def pipe_regular_file_to(socket, filename)
+  def headers(filename)
+    headers = [
+      "Content-Length: #{File.size(filename)}",
+      "Content-Type: #{mime_type(filename)}"
+    ]
+  end
+
+  def write_regular_file_to(socket, filename)
     begin
       File.open(filename) do |file|
-        headers = [
-          "Content-Length: #{File.size(filename)}",
-          "Content-Type: #{mime_type(filename)}"
-        ]
-
-        Response.new(200, headers).write_to(socket) do
+        Response.new(200, headers(filename)).write_to(socket) do
           read_file_in_chunks(file) do |bytes|
             socket.write bytes
           end
@@ -46,15 +47,23 @@ class Request::Get < Request::Head
     end
   end
 
-  def write_directory_listing_to(socket, directory, root)
+  def show_index_file(socket, directory, root)
     INDEX_FILES.each do |filename|
       index_file = File.join directory, filename
       if File.exist? index_file
-        return pipe_regular_file_to socket, index_file
+        return write_regular_file_to socket, index_file
       end
     end
 
+    false
+  end
+
+  def show_generated_index(socket, directory, root)
     DirectoryListing.new(directory, root).write_to socket
+  end
+
+  def write_directory_listing_to(socket, directory, root)
+    show_index_file(socket, directory, root) || show_generated_index(socket, directory, root)
   end
 
   def mime_type(filename)
