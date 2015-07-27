@@ -1,5 +1,5 @@
-require "./http_error"
-require "./response"
+require_relative "./http_error"
+require_relative "./response"
 
 class Request < Struct.new(:headers, :uri, :body)
   REQUEST_FORMAT = /^(\w+)\s+([^\s]+)\s+HTTP\/(\d+(?:\.(\d+)))$/

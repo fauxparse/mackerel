@@ -24,7 +24,7 @@ class Response::FileResponse < Response
         file.close
       end
     rescue Errno::EACCES
-      Response.new(403).write_to(socket)
+      raise new HTTPError, 403
     end
   end
 

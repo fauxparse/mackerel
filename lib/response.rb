@@ -24,6 +24,10 @@ class Response
     @headers = headers
   end
 
+  def head(socket, &block)
+    write_to socket, &block
+  end
+
   def write_to(socket)
     socket.write response_line
     headers.each do |header|
@@ -46,12 +50,11 @@ class Response
     elsif File.exist? filename
       Response::FileResponse.from_file filename, server.root
     else
-      new(404).write_to(socket) do
-        socket.write "I couldn’t find #{filename}.\n"
-      end
+      Response::NotFoundResponse.new uri
     end
   end
 end
 
 require_relative "./response/file_response"
 require_relative "./response/directory_response"
+require_relative "./response/not_found_response"

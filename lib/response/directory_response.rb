@@ -13,10 +13,6 @@ class Response::DirectoryResponse < Response
     super + ["Content-Length: #{html.length}"]
   end
 
-  def head(socket, &block)
-    write_to socket, &block
-  end
-
   def get(socket)
     head(socket) { socket.write html }
   end

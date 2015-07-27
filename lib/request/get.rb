@@ -1,5 +1,6 @@
 class Request::Get < Request
   def send_response(server, socket)
-    Response.from(server, uri).get(socket)
+    response = Response.from(server, uri)
+    response.get(socket)
   end
 end
