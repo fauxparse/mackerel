@@ -1,4 +1,5 @@
 require "#{File.dirname(__FILE__)}/head"
+require_relative "../directory_listing.rb"
 require "mime/types"
 
 class Request::Get < Request::Head
@@ -11,7 +12,7 @@ class Request::Get < Request::Head
     if File.exist? filename
       if filename =~ /^#{server.root}(?:\/.*)?$/
         if File.directory? filename
-          write_directory_listing_to socket, filename
+          write_directory_listing_to socket, filename, server.root
         else
           pipe_regular_file_to socket, filename
         end
@@ -45,7 +46,7 @@ class Request::Get < Request::Head
     end
   end
 
-  def write_directory_listing_to(socket, directory)
+  def write_directory_listing_to(socket, directory, root)
     INDEX_FILES.each do |filename|
       index_file = File.join directory, filename
       if File.exist? index_file
@@ -53,9 +54,7 @@ class Request::Get < Request::Head
       end
     end
 
-    Response.new.write_to(socket) do
-      socket.write "#{directory} is a directory\r\n"
-    end
+    DirectoryListing.new(directory, root).write_to socket
   end
 
   def mime_type(filename)
@@ -69,6 +68,6 @@ class Request::Get < Request::Head
   private
 
   def read_file_in_chunks(file, chunk_size = MEGABYTE)
-    yield f.read(chunk_size) until f.eof?
+    yield file.read(chunk_size) until file.eof?
   end
 end
