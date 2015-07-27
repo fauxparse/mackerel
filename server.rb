@@ -15,14 +15,10 @@ class Server
 
   def run
     loop do
-      begin
-        socket = server.accept_nonblock
-      rescue IO::WaitReadable, Errno::EINTR
-        IO.select([server])
-        retry
+      Thread.fork(server.accept) do |socket|
+        Client.new(self, socket).handle_request
+        socket.close
       end
-
-      Client.new(self, socket).handle_request
     end
   end
 
