@@ -64,9 +64,6 @@ The GET method means retrieve whatever information (in the form of an entity) is
 - HEAD:
 The HEAD method is identical to GET except that the server must not return any Entity-Body in the response. 
 
-- POST:
-The POST method is used to request that the destination server accept the entity enclosed in the request as a new subordinate of the resource identified by the Request-URI in the Request-Line. 
-
 ## Respones
 ```
  Full-Response   = Status-Line              ; Section 6.1
