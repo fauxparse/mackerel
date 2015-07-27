@@ -37,4 +37,21 @@ class Response
   def response_line
     "HTTP/1.0 #{status} #{Response::MESSAGES[status]}\r\n"
   end
+
+  def self.from(server, uri)
+    filename = File.expand_path "." + uri, server.root
+
+    if File.directory? filename
+      Response::DirectoryResponse.from_directory filename, server.root
+    elsif File.exist? filename
+      Response::FileResponse.from_file filename, server.root
+    else
+      new(404).write_to(socket) do
+        socket.write "I couldn’t find #{filename}.\n"
+      end
+    end
+  end
 end
+
+require_relative "./response/file_response"
+require_relative "./response/directory_response"
