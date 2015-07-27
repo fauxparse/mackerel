@@ -3,6 +3,6 @@ class HTTPError < Exception
 
   def initialize(status = 500)
     @status = status
-    super Response.MESSAGES[status]
+    super Response::MESSAGES[status]
   end
 end

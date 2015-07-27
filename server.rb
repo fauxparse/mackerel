@@ -22,7 +22,7 @@ class Server
         retry
       end
 
-      Client.new(socket).handle_request
+      Client.new(self, socket).handle_request
     end
   end
 
@@ -32,5 +32,13 @@ class Server
 
   def port
     options[:port]
+  end
+
+  def base_directory
+    File.expand_path options[:directory], File.dirname(__FILE__)
+  end
+
+  def log_request(request_line)
+    puts request_line
   end
 end

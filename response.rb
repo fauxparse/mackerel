@@ -29,6 +29,9 @@ class Response
     headers.each do |header|
       socket.write "#{header}\r\n"
     end
+    socket.write "\r\n"
+
+    yield if block_given?
   end
 
   def response_line

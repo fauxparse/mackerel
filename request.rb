@@ -1,14 +1,14 @@
 require "./http_error"
 require "./response"
 
-class Request < Struct.new(:socket, :headers, :uri, :body)
+class Request < Struct.new(:headers, :uri, :body)
   REQUEST_FORMAT = /^(\w+)\s+([^\s]+)\s+HTTP\/(\d+(?:\.(\d+)))$/
 
   def send_response
     Response.new.write_to socket
   end
 
-  def self.parse(socket)
+  def self.parse(server, socket)
     bad_request! unless request_line = socket.gets
 
     request_line.chomp!
@@ -16,6 +16,8 @@ class Request < Struct.new(:socket, :headers, :uri, :body)
     if request_line =~ REQUEST_FORMAT && $3.to_i == 1
       verb = $1
       uri = $2
+
+      server.log_request request_line
 
       klass = request_class_for verb
       if klass
@@ -27,7 +29,7 @@ class Request < Struct.new(:socket, :headers, :uri, :body)
         # body = socket.readlines
         body = []
 
-        klass.new socket, headers, uri, body
+        klass.new headers, uri, body
       else
         bad_request!
       end
