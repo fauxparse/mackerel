@@ -34,7 +34,7 @@ class Server
     options[:port]
   end
 
-  def base_directory
+  def root
     File.expand_path options[:directory], File.dirname(__FILE__)
   end
 

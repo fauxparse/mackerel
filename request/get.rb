@@ -3,37 +3,56 @@ require "mime/types"
 
 class Request::Get < Request::Head
   MEGABYTE = 1_048_576
+  INDEX_FILES = %w(index.html index.htm)
 
   def send_response(server, socket)
-    filename = File.expand_path "." + uri, server.base_directory
+    filename = File.expand_path "." + uri, server.root
 
     if File.exist? filename
-      if File.directory? filename
-        write_directory_listing_to socket, filename
+      if filename =~ /^#{server.root}(?:\/.*)?$/
+        if File.directory? filename
+          write_directory_listing_to socket, filename
+        else
+          pipe_regular_file_to socket, filename
+        end
       else
-        pipe_regular_file_to socket, filename
+        send_error_response socket, 403, "Access to #{filename} is forbidden."
       end
     else
-      Response.new(404).write_to(socket) do
-        socket.write "I couldn’t find #{filename}\r\n"
-      end
+      send_error_response socket, 404, "I couldn’t find #{filename}."
     end
   end
 
   def pipe_regular_file_to(socket, filename)
-    headers = [
-      "Content-Length: #{File.size(filename)}",
-      "Content-Type: #{mime_type(filename)}"
-    ]
+    begin
+      File.open(filename) do |file|
+        headers = [
+          "Content-Length: #{File.size(filename)}",
+          "Content-Type: #{mime_type(filename)}"
+        ]
 
-    Response.new(200, headers).write_to(socket) do
-      read_file_in_chunks(filename) do |bytes|
-        socket.write bytes
+        Response.new(200, headers).write_to(socket) do
+          read_file_in_chunks(file) do |bytes|
+            socket.write bytes
+          end
+        end
+
+        file.close
       end
+
+    rescue Errno::EACCES
+      send_error_response socket, 403, "Access to #{filename} is forbidden."
     end
   end
 
   def write_directory_listing_to(socket, directory)
+    INDEX_FILES.each do |filename|
+      index_file = File.join directory, filename
+      if File.exist? index_file
+        return pipe_regular_file_to socket, index_file
+      end
+    end
+
     Response.new.write_to(socket) do
       socket.write "#{directory} is a directory\r\n"
     end
@@ -49,10 +68,7 @@ class Request::Get < Request::Head
 
   private
 
-  def read_file_in_chunks(filename, chunk_size = MEGABYTE)
-    File.open(filename, "rb") do |f|
-      yield f.read(chunk_size) until f.eof?
-      f.close
-    end
+  def read_file_in_chunks(file, chunk_size = MEGABYTE)
+    yield f.read(chunk_size) until f.eof?
   end
 end

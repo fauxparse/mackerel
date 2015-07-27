@@ -59,4 +59,10 @@ class Request < Struct.new(:headers, :uri, :body)
     verb.upcase!
     valid_request_types.detect { |type| type.verb == verb }
   end
+
+  def send_error_response(socket, status, message)
+    Response.new(status).write_to(socket) do
+      socket.write "#{message}\r\n"
+    end
+  end
 end
