@@ -1,7 +1,7 @@
 require_relative "./http_error"
 require_relative "./response"
 
-class Request < Struct.new(:headers, :uri, :body)
+class Request < Struct.new(:headers, :uri)
   REQUEST_FORMAT = /^(\w+)\s+([^\s]+)\s+HTTP\/(\d+(?:\.(\d+)))$/
 
   def send_response
@@ -21,15 +21,8 @@ class Request < Struct.new(:headers, :uri, :body)
 
       klass = request_class_for verb
       if klass
-        headers = []
-        while line = socket.gets
-          break if line.strip.empty?
-          headers << line
-        end
-        # body = socket.readlines
-        body = []
-
-        klass.new headers, uri, body
+        headers = get_headers_from socket
+        klass.new headers, uri
       else
         bad_request!
       end
@@ -43,6 +36,14 @@ class Request < Struct.new(:headers, :uri, :body)
   end
 
   private
+
+  def self.get_headers_from(socket)
+    headers = []
+    while line = socket.gets
+      break if line.strip.empty?
+      headers << line
+    end
+  end
 
   def self.verb
     name.split("::").last.upcase
