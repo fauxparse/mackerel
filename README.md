@@ -11,7 +11,6 @@ _______________________________________
 HTTP/1.0 200 OK 
 Content-Type: text/html
 Content-Length: 145
-Connection: close 
 <!DOCTYPE html>
 <html>
 <head>
